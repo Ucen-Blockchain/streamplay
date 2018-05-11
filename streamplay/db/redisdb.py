@@ -7,7 +7,8 @@ import redis
 def connect_to_db(hostname, portnumber, password=''):
     """ 
     Args:
-        hostname (string) : IP addess of the machine where redis-server is running
+        hostname (string) : IP address of the machine where redis-server
+                            is running
         portnumber (integer) : Port number, default is 6379
         password (string) : Default password is ''
 
@@ -19,11 +20,12 @@ def connect_to_db(hostname, portnumber, password=''):
         r = redis.Redis(host=hostname,
                         port=portnumber,
                         password=password)
-        r.ping()                        
+        r.ping()
     except redis.ConnectionError:
         print('ConnectionError: is the redis-server running?')
         sys.exit()
-    return r 
+    return r
+
 
 def ingest_to_db(r, key_data):
     """ 
@@ -34,6 +36,8 @@ def ingest_to_db(r, key_data):
         data (string)
    
     commit - stage
+
+
 
     """
     key, data = key_data
@@ -49,7 +53,9 @@ def pull_and_store(r, chainsync):
     Return:
         The specified block's information  
     """
-    for key_data in chainsync.stream(['blocks', 'status'], mode='irreversible', batch_size=1):
+    for key_data in chainsync.stream(['blocks', 'status'],
+                                     mode='irreversible',
+                                     batch_size=1):
         ingest_to_db(r, key_data)
 
 

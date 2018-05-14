@@ -1,63 +1,60 @@
+import json
 import sys
 
 import chainsync
 import redis
 
 
-def connect_to_db(hostname, portnumber, password=''):
-    """ 
-    Args:
-        hostname (string) : IP address of the machine where redis-server
-                            is running
-        portnumber (integer) : Port number, default is 6379
-        password (string) : Default password is ''
+class RedisDB:
 
-    Returns:
-        redis.client.Redis instance --> referred to as 'r' in other places
-    """
+    def __init__(self, hostname='localhost', portnumber=6379, password=''):
+        """ Args:
+                hostname (string): IP address of the machine where redis-server
+                                    is running
+                portnumber (integer): Port number, default is 6379
+                password (string): Default password is ''
+        """
+        self.hostname = hostname
+        self.portnumber = portnumber
+        self.password = password
+        self.r = None
 
-    try:
-        r = redis.Redis(host=hostname,
-                        port=portnumber,
-                        password=password)
-        r.ping()
-    except redis.ConnectionError:
-        print('ConnectionError: is the redis-server running?')
-        sys.exit()
-    return r
+    def connect_to_db(self):
+        """ Establishes connection with redis """
+        r = redis.Redis(host=self.hostname,
+                        port=self.portnumber,
+                        password=self.password)
+        try:
+            r.ping()
+        except redis.ConnectionError:
+            sys.exit('ConnectionError: is the redis-server running?')
+        self.r = r
 
+    def ingest_to_db(self, key_data):
+        """ Args:
+            key_data (string)
+        """
+        self.r.rpush(key_data[0], json.dumps(key_data[1]))
 
-def ingest_to_db(r, key_data):
-    """ 
-    Args:
-        chainsync () :
-        r (redis.client.Redis) : Connection instance to redis-server
-        key (string)
-        data (string)
-   
-    commit - stage
+    def pull_and_store(self, chainsync):
+        """ Args:
+                chainsync () :
 
+            Return:
+                The specified block's information """
+        for key_data in chainsync.stream(['blocks', 'status'],
+                                         mode='irreversible',
+                                         batch_size=1):
+            self.ingest_to_db(key_data)
 
+    def get_total_num_of_blocks(self):
+        return self.r.llen('block'), self.r.llen('status')
 
-    """
-    key, data = key_data
-    r.rpush(key, data)
+    def get_data(self, datatype, start, end):
+        """ have to model this better, then return """
+        data = self.r.lrange(datatype, start, end)
+        for i in range(len(data)):
+            data[i] = data[i].decode()
+            data[i] = json.loads(data[i])
+        return data
 
-
-def pull_and_store(r, chainsync):
-    """ 
-    Args:
-        r (redis.client.Redis) : Connection instance to redis-server
-        chainsync () :
-
-    Return:
-        The specified block's information  
-    """
-    for key_data in chainsync.stream(['blocks', 'status'],
-                                     mode='irreversible',
-                                     batch_size=1):
-        ingest_to_db(r, key_data)
-
-
-if __name__ == "__main__":
-    pass

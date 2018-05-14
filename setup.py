@@ -9,5 +9,5 @@ setup(
     license='MIT',
     packages=find_packages(exclude=['examples']),
     include_package_data=False,
-    install_requires=["chainsync", "redis"],
+    install_requires=["chainsync", "redis", "pymongo"],
 )

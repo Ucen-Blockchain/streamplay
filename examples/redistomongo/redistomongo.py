@@ -8,6 +8,10 @@ from streamplay.db import redisdb
 
 """ discussion on db schema is to be done """
 
+""" Could be improved:
+    1. Password
+ """
+
 
 def store(fetch_return, m):
     block_data, status_data, total_count = fetch_return

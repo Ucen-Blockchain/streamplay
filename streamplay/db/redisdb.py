@@ -4,6 +4,11 @@ import sys
 import chainsync
 import redis
 
+""" Could be improved:
+    1. SSL encrytion
+    2. Password
+ """
+
 
 class RedisDB:
 

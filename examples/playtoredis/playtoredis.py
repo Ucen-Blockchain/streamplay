@@ -3,8 +3,8 @@ import configparser
 import os
 import sys
 
-from chainsync import ChainSync
-from chainsync.adapters.steemv2 import SteemV2Adapter
+from steem.steem import Steemd
+from steem.blockchain import Blockchain
 from streamplay.db import redisdb
 
 
@@ -18,13 +18,13 @@ def read_config():
         later """
     config = configparser.ConfigParser()
     config.read('config.ini')
-    endpoints = ast.literal_eval(config.get('chainsync', 'endpoints'))
+    endpoints = ast.literal_eval(config.get('ucen-python', 'endpoints'))
     hostname = config.get('redis-server', 'hostname')
     portnumber = config.getint('redis-server', 'portnumber')
     return endpoints, hostname, portnumber
 
 
-def connect_to_redis(hostname, portnumber, password):
+def connect_to_redis(hostname, portnumber, password=''):
     """ get a redisdb instance """
     r = redisdb.RedisDB(hostname=hostname,
                         portnumber=portnumber,
@@ -36,10 +36,12 @@ def connect_to_redis(hostname, portnumber, password):
 
 if __name__ == "__main__":
     endpoints, hostname, portnumber = read_config()
-    r = connect_to_redis(hostname, portnumber, password)
-    adapter = SteemV2Adapter(endpoints=endpoints)
-    chainsync = ChainSync(adapter)
+    r = connect_to_redis(hostname, portnumber)
+
+    s = Steemd(nodes=endpoints)
+    b = Blockchain(steemd_instance=s)
+
     try:
-        r.pull_and_store(chainsync)
+        r.pull_and_store(b)
     except KeyboardInterrupt:
         pass

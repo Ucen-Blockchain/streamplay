@@ -14,12 +14,10 @@ from streamplay.db import redisdb
 
 
 def store(fetch_return, m):
-    block_data, status_data, total_count = fetch_return
-    db = m.play
-    if block_data:
-        db.block.insert_many(block_data)
-    if status_data:
-        db.status.insert_many(status_data)
+    data, total_count = fetch_return
+    db = m.ucen
+    if data:
+        db.block.insert_many(data)
     update_index(total_count)
 
 
@@ -34,9 +32,8 @@ def update_index(total_count):
 def fetch(r):
     last_index = get_last_fetched_data_index()
     total_count = r.get_total_num_of_blocks()
-    block_data = r.get_data('block', last_index[0], total_count[0] - 1)
-    status_data = r.get_data('status', last_index[1], total_count[1] - 1)
-    return block_data, status_data, total_count
+    data = r.get_data(last_index, total_count - 1)
+    return data, total_count
 
 
 def get_last_fetched_data_index():

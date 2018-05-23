@@ -1,3 +1,4 @@
 streamplay/db/__pycache__/*
 streamplay/__pycache__/*
 setup.py.save
+examples/playtoredis/errors

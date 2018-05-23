@@ -1,7 +1,7 @@
 import json
 import sys
 
-import chainsync
+from steem.blockchain import Blockchain
 import redis
 
 """ Could be improved:
@@ -35,29 +35,27 @@ class RedisDB:
             sys.exit('ConnectionError: is the redis-server running?')
         self.r = r
 
-    def ingest_to_db(self, key_data):
+    def ingest_to_db(self, data):
         """ Args:
             key_data (string)
         """
-        self.r.rpush(key_data[0], json.dumps(key_data[1]))
+        self.r.rpush('stream', json.dumps(data))
 
-    def pull_and_store(self, chainsync):
+    def pull_and_store(self, b):
         """ Args:
                 chainsync () :
 
             Return:
                 The specified block's information """
-        for key_data in chainsync.stream(['blocks', 'status'],
-                                         mode='irreversible',
-                                         batch_size=1):
-            self.ingest_to_db(key_data)
+        for data in b.stream_from(full_blocks=True):
+            self.ingest_to_db(data)
 
     def get_total_num_of_blocks(self):
-        return self.r.llen('block'), self.r.llen('status')
+        return self.r.llen('stream')
 
-    def get_data(self, datatype, start, end):
+    def get_data(self, start, end):
         """ have to model this better, then return """
-        data = self.r.lrange(datatype, start, end)
+        data = self.r.lrange('stream', start, end)
         for i in range(len(data)):
             data[i] = data[i].decode()
             data[i] = json.loads(data[i])

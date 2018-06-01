@@ -12,7 +12,10 @@ import redis
 
 class RedisDB:
 
-    def __init__(self, hostname='localhost', portnumber=6379, password=''):
+    def __init__(self, hostname='localhost',
+                 portnumber=6379,
+                 password='',
+                 last_index=0):
         """ Args:
                 hostname (string): IP address of the machine where redis-server
                                     is running
@@ -22,6 +25,7 @@ class RedisDB:
         self.hostname = hostname
         self.portnumber = portnumber
         self.password = password
+        self.last_index = last_index
         self.r = None
 
     def connect_to_db(self):
@@ -35,20 +39,42 @@ class RedisDB:
             sys.exit('ConnectionError: is the redis-server running?')
         self.r = r
 
-    def ingest_to_db(self, data):
+    def ingest_to_db_stream(self, data):
         """ Args:
-            key_data (string)
+            data (string)
         """
         self.r.rpush('stream', json.dumps(data))
 
-    def pull_and_store(self, b):
+    def ingest_to_db_sync(self, data):
+        """ Args:
+            data (string)
+        """
+        self.r.rpush('sync', json.dumps(data))
+
+    def pull_and_store_stream(self, b):
         """ Args:
                 chainsync () :
 
             Return:
                 The specified block's information """
         for data in b.stream_from(full_blocks=True):
-            self.ingest_to_db(data)
+            self.ingest_to_db_stream(data)
+
+    def pull_and_store_sync(self, b):
+        """ Args:
+                chainsync () :
+
+            Return:
+                The specified block's information """
+        records_synced = 0
+        try:
+            for data in b.stream_from(start_block=self.last_index,
+                                      batch_operations=True,
+                                      full_blocks=True):
+                records_synced += 1
+                self.ingest_to_db_sync(data)
+        except:
+            return records_synced  # number of records synced
 
     def get_total_num_of_blocks(self):
         return self.r.llen('stream')
@@ -60,4 +86,3 @@ class RedisDB:
             data[i] = data[i].decode()
             data[i] = json.loads(data[i])
         return data
-

@@ -9,14 +9,14 @@ services:
       - ${APP_DIR}:/app
     command: tail -f /dev/null # todo fixme
     networks:
-      - bms_networking
+      - develop_bms_networking
 
   redis:
     image: redis
     container_name: uplaystream_redis
     networks:
-      - bms_networking
+      - develop_bms_networking
 
 networks:
-  bms_networking:
+  develop_bms_networking:
     external: true

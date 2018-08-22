@@ -19,5 +19,5 @@ deploy_develop:
     - ssh-keyscan -H $DEVELOP_SERVER >> ~/.ssh/known_hosts
     - chmod 700 ~/.ssh && chmod 644 ~/.ssh/known_hosts
     - ssh ci@$DEVELOP_SERVER "mkdir -p /apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME || true"
-    - rsync -arv --exclude=*.(ini|txt) --exclude=.* --include=*.py ci@$DEVELOP_SERVER:/apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME
+    - rsync -arv --exclude=.* --exclude=*.ini --exclude=*.txt --include=requirements.txt --include=*.py * ci@$DEVELOP_SERVER:/apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME
     - echo "[SKIP] should run 'docker run xxxxx'"

@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  stream:
+    image: python:3.4.6
+    container_name: uplaystream_app
+    working_dir: "/app"
+    volumes:
+      - ${APP_DIR}:/app
+    command: tail -f /dev/null # todo fixme
+    networks:
+      - bms_networking
+
+  redis:
+    image: redis
+    container_name: uplaystream_redis
+    networks:
+      - bms_networking
+
+networks:
+  bms_networking:
+    external: true

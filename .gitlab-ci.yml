@@ -14,7 +14,7 @@ deploy_develop:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-    - echo "$PHD_PULL_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    # - echo "$PHD_PULL_KEY" | tr -d '\r' | ssh-add - > /dev/null # as it did't denpends private git repo as dependencies
     - mkdir -p ~/.ssh
     - ssh-keyscan -H $DEVELOP_SERVER >> ~/.ssh/known_hosts
     - chmod 700 ~/.ssh && chmod 644 ~/.ssh/known_hosts

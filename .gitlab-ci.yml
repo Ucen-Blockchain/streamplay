@@ -20,4 +20,4 @@ deploy_develop:
     - chmod 700 ~/.ssh && chmod 644 ~/.ssh/known_hosts
     - ssh ci@$DEVELOP_SERVER "mkdir -p /apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME || true"
     - rsync -arv --exclude=.* --exclude=*.ini --exclude=*.txt --include=requirements.txt --include=*.py * ci@$DEVELOP_SERVER:/apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME
-    - ssh ci@$DEVELOP_SERVER "export APP_DIR=/apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME && cd $APP_DIR && docker-compose up -d"
+    - ssh ci@$DEVELOP_SERVER "export APP_DIR=/apps/ucen-streamplay/develop && cd $APP_DIR && docker-compose up -d"

@@ -1,0 +1,22 @@
+image: python:3.6.4
+
+stages:
+  - test
+  - deploy
+
+deploy_develop:
+  image: instrumentisto/rsync-ssh
+  tags:
+    - docker
+  only:
+    - develop
+  script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - echo "$PHD_PULL_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -H $DEVELOP_SERVER >> ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh && chmod 644 ~/.ssh/known_hosts
+    - rsync --exclude=*.ini --exclude=*.txt --include=*.py . ci@$DEVELOP_SERVER:/apps/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME
+    - echo "[SKIP] should run 'docker run xxxxx'"

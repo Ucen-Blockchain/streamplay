@@ -1,23 +1,4 @@
-image: python:3.6.4
+image: python:3.6.5
 
 stages:
   - test
-  - deploy
-
-deploy_develop:
-  image: instrumentisto/rsync-ssh
-  tags:
-    - docker
-  only:
-    - develop
-  script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-    # - echo "$PHD_PULL_KEY" | tr -d '\r' | ssh-add - > /dev/null # as it did't denpends private git repo as dependencies
-    - mkdir -p ~/.ssh
-    - ssh-keyscan -H $DEVELOP_SERVER >> ~/.ssh/known_hosts
-    - chmod 700 ~/.ssh && chmod 644 ~/.ssh/known_hosts
-    - ssh ci@$DEVELOP_SERVER "mkdir -p /apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME || true"
-    - rsync -arv --exclude=.* --exclude=*.ini --exclude=*.txt --include=requirements.txt --include=*.py * ci@$DEVELOP_SERVER:/apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME
-    - ssh ci@$DEVELOP_SERVER "export APP_DIR=/apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME && cd /apps/ucen-$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME && docker-compose up -d"

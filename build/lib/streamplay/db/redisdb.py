@@ -1,13 +1,11 @@
 import json
 import sys
-import redis
-
 
 from steem.blockchain import Blockchain
-from streamplay.utils import read_config
+import redis
 
 """ Could be improved:
-    1. SSL encryption
+    1. SSL encrytion
     2. Password
  """
 
@@ -24,8 +22,6 @@ class RedisDB:
                 portnumber (integer): Port number, default is 6379
                 password (string): Default password is ''
         """
-        endpoints, hostname, portnumber, password, last_index = read_config()
-
         self.hostname = hostname
         self.portnumber = portnumber
         self.password = password

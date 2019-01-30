@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 import ast
 import configparser
 import os
@@ -15,7 +16,7 @@ def silence_stdout():
 
 def read_config():
     """ assuming all values are set properly, missing data etc can be handled
-        later """
+    later """
     config = configparser.ConfigParser()
     config.read('config.ini')
     endpoints = ast.literal_eval(config.get('ucen-python', 'endpoints'))
@@ -41,18 +42,7 @@ def connect_to_redis(hostname, portnumber, password, last_index=0):
                         password=password,
                         last_index=last_index)
 
-    # redis.StrictRedis(host='localhost', port=6379, db=0, password=None, socket_timeout=None, connection_pool=None, charset='utf-8', errors='strict', unix_socket_path=None)
+        # redis.StrictRedis(host='localhost', port=6379, db=0, password=None, socket_timeout=None, connection_pool=None, charset='utf-8', errors='strict', unix_socket_path=None)
     """ connect to db """
     r.connect_to_db()
     return r  # this is RedisDB object
-
-
-if __name__ == "__main__":
-    endpoints, hostname, portnumber, password, last_index = read_config()
-    r = connect_to_redis(hostname, portnumber, password, last_index)
-
-    s = Steemd(nodes=endpoints)
-    b = Blockchain(steemd_instance=s)
-
-    num_of_rec_sync = r.pull_and_store_sync(b)
-    update_index(last_index+num_of_rec_sync)

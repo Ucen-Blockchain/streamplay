@@ -6,12 +6,8 @@ import sys
 from steem.steem import Steemd
 from steem.blockchain import Blockchain
 from streamplay.db import redisdb
-from streamplay.utils import read_config
+from streamplay.utils import read_config, silence_stdout
 
-
-def silence_stdout():
-    """ Redirects stdout to devnull """
-    sys.stdout = open(os.devnull, 'w')
 
 
 def read_config():
@@ -19,7 +15,7 @@ def read_config():
         later """
     config = configparser.ConfigParser()
     config.read('config.ini')
-    endpoints = ast.literal_eval(config.get('ucen-python', 'endpoints'))
+    endpoints = ast.literal_eval(config.get('steem-blockchain', 'endpoints'))
     hostname = config.get('redis-server', 'hostname')
     portnumber = config.getint('redis-server', 'portnumber')
     password = config.get('redis-server', 'password')

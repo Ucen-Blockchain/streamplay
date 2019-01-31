@@ -19,8 +19,8 @@ def read_config():
     later """
     config = configparser.ConfigParser()
     config.read('config.ini')
-    endpoints = ast.literal_eval(config.get('ucen-python', 'endpoints'))
-    last_index = config.getint('ucen-python', 'last_index')
+    endpoints = ast.literal_eval(config.get('steem-blockchain', 'endpoints'))
+    last_index = config.getint('steem-blockchain', 'last_index')
     hostname = config.get('redis-server', 'hostname')
     portnumber = config.getint('redis-server', 'portnumber')
     password = config.get('redis-server', 'password')
@@ -30,7 +30,7 @@ def read_config():
 def update_index(count):
     config = configparser.ConfigParser()
     config.read('config.ini')
-    config.set('ucen-python', 'last_index', str(count))
+    config.set('steem-blockchain', 'last_index', str(count))
     with open('config.ini', 'w+') as configfile:
         config.write(configfile)
 

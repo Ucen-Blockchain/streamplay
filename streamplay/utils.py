@@ -26,6 +26,13 @@ def read_config():
     password = config.get('redis-server', 'password')
     return endpoints, hostname, portnumber, password, last_index
 
+def read_config_section(section):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    hostname = config.get(section, 'hostname')
+    portnumber = config.getint(section, 'portnumber')
+    password = config.get(section, 'password')
+    return hostname, portnumber, password
 
 def update_index(count):
     config = configparser.ConfigParser()

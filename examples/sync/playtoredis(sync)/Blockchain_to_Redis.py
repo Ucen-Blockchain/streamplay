@@ -18,7 +18,7 @@ def silence_stdout():
 def update_index(count):
     config = configparser.ConfigParser()
     config.read('config.ini')
-    config.set('ucen-python', 'last_index', str(count))
+    config.set('steem-blockchain', 'last_index', str(count))
     with open('config.ini', 'w+') as configfile:
         config.write(configfile)
 
